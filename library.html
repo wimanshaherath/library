@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <style>
+        *{
+            box-sizing:border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        header{
+            margin:auto;
+            text-align: center;
+            font-size: 28pt;
+            width:100%;
+            height:3rem;
+            background-color: blueviolet;
+            color:white;
+        }
+        .container{
+            width:100%;
+            height:fit-content;
+            border:1px solid black;
+            padding:1px;
+            margin-top:5px;
+        }
+        .bookTable,.addBooks{
+            width:100%;
+            margin-top:3px;
+            border-collapse:collapse;
+        }
+        .bookTable th{
+            background-color:white;
+            color:black;
+            font-size: 15pt;
+            text-align: center;
+            padding:2px;
+        }
+        .bookTable tr,.addBooks tr{
+            border-bottom: 1px solid gray;
+            
+        }
+        .bookTable td{
+            text-align: center;
+            padding:2px;
+        }
+        #add{
+            float:right;
+            margin-left:2%;
+            margin-top:3%;
+            border-radius: 13px;
+            background-color: #0f71c2;
+            border:none;
+            color:white;
+            width:90px;
+            padding:5px;
+            cursor:pointer;
+            margin-bottom:5px;
+        }
+        #addBooks
+        {
+            width:100%;
+            display: none;
+            overflow-x: auto;
+        }
+
+        @media only screen and (max-width:500px)
+        {
+            .bookTable th{
+           
+            font-size: 12pt;
+            
+            }
+       
+        }
+
+        @media only screen and (max-width:640px)
+        {
+            .addBooks td
+            {
+                width:50vw;
+                column-span: all;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Library</header>
+    <div class='container'>
+        
+        <table class='bookTable' id='bookTable'>
+            <tr>
+                <th>Author</th>
+                <th>Title</th>
+                <th>No. of pages</th>
+                <th>State</th>
+                <th></th>
+            </tr>
+            <!--<tr id='1'>
+                <td>J.R.R. Talkiens</td>
+                <td>Hobbits</td>
+                <td>250</td>
+                <td>Read</td>
+                <td><a href="#">Edit</a> <a href="#">Delete</a></td>
+            </tr>
+            <tr id='2'>
+                <td>J.K. Rowling</td>
+                <td>Harry Potter</td>
+                <td>400</td>
+                <td>Read</td>
+                <td><a href="#" id='edit'>Edit</a> <a href="#" id='delete'>Delete</a></td>
+            </tr> -->
+        </table>
+        <button type='button' id='add' value='addnew'>+Add new</button>
+        <div id='addBooks'>
+            <form method='post'>
+                <table class='addBooks' >
+                    <tr>
+                        <td><input type='text' id='author' placeholder="Author" value=''></td>
+                        <td><input type='text' id='title' placeholder="Title" value=''></td>
+                        <td><input type='text' id='noOfPages' placeholder="No. of pages" value=''></td>
+                        <td><input type='checkbox' id='state' >Read</td>
+                        <td><a href="#" id='save'>Save</a></td>
+                    </tr>
+                </table>
+                
+            </form>
+        </div>
+        
+    </div>
+
+    <script>
+        var addbtn=document.getElementById('add');
+        var tableBook=document.getElementById('bookTable');
+        var formTable=document.getElementById('addBooks');
+        var editBook=document.getElementById('edit');
+        var deleteBook=document.getElementById('delete');
+        var saveBook=document.getElementById('save');
+
+        var authorText=document.getElementById('author');
+        var titleText=document.getElementById('title');
+        var pagesText=document.getElementById('noOfPages');
+        var statechk=document.getElementById('state');
+
+        let rowNames=['author','title','noOfPages','state'];
+        let id=2;
+
+        let myLibrary=[
+            {
+                author:'J.R.R. Talkiens',
+                title:'Hobbit',
+                noOfPages:250,
+                state:'Read'
+            },
+            {
+                author:'J.K. Rowling',
+                title:'Harry Potter',
+                noOfPages:400,
+                state:'Read'
+            }
+        ];
+
+        function newBookAdding(id,author,title,pages,state)
+        {
+            var string=`<tr id='${id}'>
+                <td>${author}</td>
+                <td>${title}</td>
+                <td>${pages}</td>
+                <td>${state}</td>
+                <td><a href="#" id='edit' onclick='EditRecords(this)'>Edit</a> <a href="#" id='delete' onclick='deleteData(this)'>Delete</a></td>
+            </tr>`;
+            tableBook.insertAdjacentHTML('beforeend',string);
+        }
+
+        function Book(author,title,noOfPages,state) {
+            this.author=author;
+            this.title=title;
+            this.noOfPages=noOfPages;
+            this.state=state;
+        }
+
+        function addBookToLibrary() {
+            var book=new Book(authorText.value,titleText.value,pagesText.value,(statechk.checked)?'Read':'not read');
+            myLibrary.push(book);
+
+        }
+
+        //view items on table
+        function viewOnTable()
+        {
+            tableBook.innerHTML='';
+            var string=`<tr>
+                <th>Author</th>
+                <th>Title</th>
+                <th>No. of pages</th>
+                <th>State</th>
+                <th></th>
+            </tr>`;
+            tableBook.insertAdjacentHTML('beforeend',string);
+            for(var i=0;i<myLibrary.length;i++)
+            {
+                  newBookAdding(i,myLibrary[i].author,myLibrary[i].title,myLibrary[i].noOfPages,myLibrary[i].state);
+                  id=i;
+            }
+            id++;
+        }
+
+        function EditRecords(e)
+        {
+            var index=e.parentNode.parentNode.rowIndex;
+            var activeRow=tableBook.rows[index];
+
+            
+            
+            for(var i=0;i<4;i++)
+            {
+                
+                if(i==3)
+                {
+                    var td = activeRow.getElementsByTagName("td")[i];
+                    var ele = document.createElement('input');
+                    ele.setAttribute('type', 'checkbox');
+                    ele.setAttribute('id', rowNames[3]);
+                    if(td.innerText==='Read'){ele.checked=true;} 
+                    td.innerText = 'Read';
+                    td.appendChild(ele);
+                   
+                }
+                else{
+                    var td = activeRow.getElementsByTagName("td")[i];
+                    
+                    var ele = document.createElement('input');
+                    ele.setAttribute('type', 'text');
+                    ele.setAttribute('id', rowNames[i]);
+                    ele.setAttribute('value', td.innerText);
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+                    var td = activeRow.getElementsByTagName("td")[4];
+                    
+                    var ele = document.createElement('a');
+                    ele.setAttribute('href', '#');
+                    ele.setAttribute('onclick', 'updateData(this)');
+                    ele.innerText='Save';
+                    td.innerText = '';
+                    td.appendChild(ele);
+            }
+            
+        }
+
+        function updateData(e)
+        {
+            var index=e.parentNode.parentNode.rowIndex;
+            var activeRow=tableBook.rows[index];
+            for(var i=0;i<4;i++)
+            {
+                if(i==3)
+                {
+                    var td=activeRow.getElementsByTagName("td")[i];
+                    
+                    
+                    if(td.childNodes[1].getAttribute('type')=='checkbox')
+                    {
+                        (td.childNodes[1].checked)?myLibrary[index-1][rowNames[i]]='Read':myLibrary[index-1][rowNames[i]]='not read';
+                    }
+                }
+                else{
+                    var td=activeRow.getElementsByTagName("td")[i];
+                    
+
+                    if(td.childNodes[0].getAttribute('type')=='text')
+                    {
+                       myLibrary[index-1][rowNames[i]]=td.childNodes[0].value;
+                    }
+                }
+                
+            }
+            viewOnTable();
+        }
+
+
+        function deleteData(e)
+        {
+            var index=e.parentNode.parentNode.rowIndex;
+            for(let i=0;i<myLibrary.length;i++)
+            {
+               
+                if(i==index-1)
+                {
+                    
+                    if(i==0)
+                    {
+                        myLibrary.shift();
+                        break;
+                    }
+                    else
+                    {
+                        myLibrary.splice(i,i);
+                        break;
+                    }
+                }
+            }
+            viewOnTable();
+        }
+        //open add panel
+        
+        addbtn.addEventListener('click',()=>
+        {
+            formTable.style.display='block';
+        }); 
+
+        saveBook.addEventListener('click',()=>{
+            addBookToLibrary();
+            newBookAdding(id,myLibrary[id].author,myLibrary[id].title,myLibrary[id].noOfPages,myLibrary[id].state);
+            id++;
+            authorText.value='';
+            titleText.value='';
+            pagesText.value='';
+            statechk.checked=false;
+            formTable.style.display='none';
+        }); 
+
+        
+        viewOnTable();
+
+       
+    </script>
+</body>
+</html>
